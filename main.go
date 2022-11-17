@@ -2,9 +2,9 @@ package main
 
 import (
 	"Gofiber_test/database"
+	m "Gofiber_test/models"
 	"Gofiber_test/routes"
 	"fmt"
-	m "Gofiber_test/models"
 
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/driver/mysql"
@@ -35,4 +35,5 @@ func initDatabase() {
 	fmt.Println("Database connected!")
 	database.DBConn.AutoMigrate(&m.Dogs{})
 	database.DBConn.AutoMigrate(&m.Company{})
+	database.DBConn.AutoMigrate(&m.Users{})
 }

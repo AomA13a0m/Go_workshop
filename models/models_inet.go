@@ -53,3 +53,36 @@ type Company struct {
 	Company_Mail    string `json:"company_mail"`
 	Company_Phone   int    `json:"company_phone"`
 }
+
+type Users struct {
+	gorm.Model
+	Employee_id string `json:"employee_id"`
+	Name        string `json:"name"`
+	LastName    string `json:"lastname"`
+	Birthday    string `json:"birthday"`
+	Age         int    `json:"age"`
+	Email       string `json:"email"`
+	Tel         int    `json:"tel"`
+}
+
+type UsersRes struct {
+	gorm.Model
+	Employee_id string `json:"employee_id"`
+	Name        string `json:"name"`
+	LastName    string `json:"lastname"`
+	Birthday    string `json:"birthday"`
+	Age         int    `json:"age"`
+	Email       string `json:"email"`
+	Tel         int    `json:"tel"`
+	Generation  string `json:"generation"`
+}
+
+type User_Generation struct {
+	Data          []UsersRes `json:"data"`
+	Count         int         `json:"count"`
+	GenZ          int         `json:"genZ"`
+	GenY          int         `json:"genY"`
+	GenX          int         `json:"genX"`
+	Baby_Boomer   int         `json:"baby_boomer"`
+	GI_Generation int         `json:"gi_generation"`
+}

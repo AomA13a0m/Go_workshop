@@ -9,21 +9,23 @@ import (
 
 func InetRoute(app *fiber.App) {
 
-	app.Use(basicauth.New(basicauth.Config{
+	api := app.Group("/api")  // /api
+	v1 := api.Group("/v1")    // /api/v1
+	user := v1.Group("/user") // api/v1/user
+
+	user.Use(basicauth.New(basicauth.Config{
 		Users: map[string]string{
-			"gofiber": "15112565",
+			"testgo": "17112565",
 		},
 	}))
 
-	api := app.Group("/api") // /api
-	v1 := api.Group("/v1")   // /api/v1
 	v1.Get("/", c.HelloWorld)
 
 	v1.Get("/test", c.HelloAom)
 
 	v1.Post("/", c.TestBodyParser)
 
-	v1.Get("/user/:name", c.TestParams)
+	v1.Get("/users/:name", c.TestParams)
 
 	v1.Post("/inet", c.TestQuery)
 
@@ -51,12 +53,24 @@ func InetRoute(app *fiber.App) {
 
 	//##########################################
 
+	user.Post("", c.AddUser) //adduser
+	// user.Get("/", c.GetUser)             //getuser/Read
+	user.Put("/:id", c.UpdateUser)    //updateuser
+	user.Delete("/:id", c.DeleteUser) //deleteuser
+	user.Get("/sum", c.GetGENage)
+	user.Get("/search", c.GetUserFilter) //getuser filter/Read
+
+	//##########################################
+
 	v2 := api.Group("/v2")
-	v2.Get("/", c.HelloV2)
+	v2.Get("/", c.GetUser) // api/v2/
 
-	v2.Post("/user", c.TestValidate)
+	//##########################################
 
-	v3 := api.Group("/v3")
-	v3.Get("/asc2/:tex_id", c.Asc2)
+	// v2.Get("/", c.HelloV2)
+	// v2.Post("/user", c.TestValidate)
+
+	// v3 := api.Group("/v3")
+	// v3.Get("/asc2/:tex_id", c.Asc2)
 
 }

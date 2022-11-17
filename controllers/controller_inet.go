@@ -278,3 +278,136 @@ func GetAmount(c *fiber.Ctx) error {
 	db.Scopes(AmountGreaterThan1000).Find(&dogs)
 	return c.Status(200).JSON(dogs)
 }
+
+//############################################ add user ####################################
+
+func AddUser(c *fiber.Ctx) error {
+	//twst3
+	db := database.DBConn
+	var user m.Users
+
+	if err := c.BodyParser(&user); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+
+	db.Create(&user)
+	return c.Status(201).JSON(user)
+}
+
+//########################################## get user ######################################
+
+func GetUser(c *fiber.Ctx) error {
+	db := database.DBConn
+	var users []m.Users
+
+	db.Find(&users)
+	return c.Status(200).JSON(users)
+}
+
+//########################################## update user ######################################
+
+func UpdateUser(c *fiber.Ctx) error {
+	db := database.DBConn
+	var user m.Users
+	id := c.Params("id")
+
+	if err := c.BodyParser(&user); err != nil {
+		return c.Status(503).SendString(err.Error())
+	}
+
+	db.Where("employee_id = ?", id).Updates(&user)
+	return c.Status(200).JSON(user)
+}
+
+//########################################## delete user ######################################
+
+func DeleteUser(c *fiber.Ctx) error {
+	db := database.DBConn
+	id := c.Params("id")
+	var user m.Users
+
+	result := db.Delete(&user, id)
+
+	if result.RowsAffected == 0 {
+		return c.SendStatus(404)
+	}
+
+	return c.SendStatus(200)
+
+}
+
+//########################################## get user filter ######################################
+
+func GetUserFilter(c *fiber.Ctx) error {
+	db := database.DBConn
+	search := strings.TrimSpace(c.Query("search"))
+	var user []m.Users
+
+	result := db.Find(&user, "employee_id = ? || name = ? || lastname = ? ", search)
+
+	// returns found records count, equals `len(users)
+	if result.RowsAffected == 0 {
+		return c.SendStatus(404)
+	}
+	return c.Status(200).JSON(&user)
+}
+
+//########################################## get user filter ######################################
+
+func GetGENage(c *fiber.Ctx) error {
+	db := database.DBConn
+	var user []m.Users
+
+	genZ := 0
+	genY := 0
+	genX := 0
+	baby_boomer := 0
+	gi_generation := 0
+
+	db.Find(&user)
+
+	var dataResults []m.UsersRes
+	for _, v := range user {
+
+		genStr := ""
+		if v.Age <= 23 {
+			genStr = "GenZ"
+			genZ += 1
+
+		} else if v.Age >= 24 && v.Age <= 41 {
+			genStr = "GenY"
+			genY += 1
+
+		} else if v.Age >= 42 && v.Age <= 56 {
+			genStr = "GenX"
+			genX += 1
+
+		} else if v.Age >= 57 && v.Age <= 75 {
+			genStr = "Baby Boomer"
+			baby_boomer += 1
+		} else if v.Age > 76 {
+			genStr = "G.I. Generation"
+			gi_generation += 1
+		}
+
+		d := m.UsersRes{
+			Employee_id: v.Employee_id,
+			Name:        v.Name, //coco
+			Age:         v.Age,  //199
+			Generation:  genStr, //no color
+		}
+		dataResults = append(dataResults, d)
+		// sumAmount += v.Amount
+	}
+
+	r := m.User_Generation{
+		Data:          dataResults,
+		Count:         len(user), //หาผลรวม,
+		GenZ:          genZ,
+		GenY:          genY,
+		GenX:          genX,
+		Baby_Boomer:   baby_boomer,
+		GI_Generation: gi_generation,
+	}
+	return c.Status(200).JSON(r)
+}
